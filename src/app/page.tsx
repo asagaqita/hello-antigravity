@@ -67,9 +67,14 @@ export default async function Home() {
                       {sub.isYearly && ` (≈¥${Math.round(sub.price / 12).toLocaleString()}/mo)`}
                     </p>
                   </div>
-                  <form action={deleteSubscription.bind(null, sub.id)}>
-                    <button className="text-red-500 hover:text-red-700 text-sm">Delete</button>
-                  </form>
+                  <div className="flex items-center gap-4">
+                    <Link href={`/edit/${sub.id}`} className="text-blue-500 hover:text-blue-700 text-sm">
+                      Edit
+                    </Link>
+                    <form action={deleteSubscription.bind(null, sub.id)}>
+                      <button className="text-red-500 hover:text-red-700 text-sm">Delete</button>
+                    </form>
+                  </div>
                 </div>
               ))}
               {subscriptions.length === 0 && (

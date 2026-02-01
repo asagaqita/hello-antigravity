@@ -49,3 +49,30 @@ export async function deleteSubscription(id: number) {
 
     revalidatePath("/");
 }
+export async function getSubscription(id: number) {
+    const { userId } = await auth();
+    if (!userId) return null;
+    const sub = await db.select()
+        .from(subscriptions)
+        .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)))
+        .limit(1);
+    return sub[0] || null;
+}
+
+// サブスクリプション更新処理
+export async function updateSubscription(id: number, formData: FormData) {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+    const name = formData.get("name") as string;
+    const price = parseInt(formData.get("price") as string);
+    const isYearly = formData.get("isYearly") === "true";
+    if (!name || isNaN(price)) {
+        throw new Error("Invalid input");
+    }
+    // 自分のデータのみ更新可能にする
+    await db.update(subscriptions)
+        .set({ name, price, isYearly })
+        .where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)));
+    revalidatePath("/");
+    redirect("/");
+}
